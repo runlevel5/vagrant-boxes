@@ -2,10 +2,6 @@
 debian_version="`lsb_release -r | awk '{print $2}'`";
 major_version="`echo $debian_version | awk -F. '{print $1}'`";
 
-if [ -e /etc/yaboot.conf ] ; then
-  sed -i 's/append\=\"/append\=\"net\.ifnames\=0 biosdevname\=0\ /' /etc/yaboot.conf
-fi
-
 if [ "$major_version" -le "8" ]; then
   echo "Disabling automatic udev rules for network interfaces in Debian"
   # Disable automatic udev rules for network interfaces in Ubuntu,
@@ -23,3 +19,14 @@ fi
 
 # Adding a 2 sec delay to the interface up, to make the dhclient happy
 echo "pre-up sleep 2" >> /etc/network/interfaces;
+
+# Start dhcp on boot
+cat > /etc/systemd/network/20-dhcp.network <<EOF
+[Match]
+Name=enp*
+
+[Network]
+DHCP=ipv4
+EOF
+
+systemctl enable systemd-networkd
