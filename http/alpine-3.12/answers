@@ -1,14 +1,16 @@
 KEYMAPOPTS="us us"
-HOSTNAMEOPTS="-n localhost"
+HOSTNAMEOPTS="-n alpine"
 INTERFACESOPTS="auto lo
 iface lo inet loopback
 
 auto eth0
 iface eth0 inet dhcp
+      hostname alpine
 "
 TIMEZONEOPTS="-z UTC"
+DNSOPTS="-d local -n 8.8.8.8 8.8.4.4"
 PROXYOPTS="none"
 APKREPOSOPTS="http://dl-cdn.alpinelinux.org/alpine/v3.12/main"
 SSHDOPTS="-c openssh"
 NTPOPTS="-c chrony"
-DISKOPTS="-m sys /dev/sda"
+DISKOPTS="-s 0 -m sys /dev/sda"

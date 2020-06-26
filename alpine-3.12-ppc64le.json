@@ -19,24 +19,11 @@
 	"<wait10><wait10><wait10>",
 	"<wait10><wait10><wait10>",
 	"<wait10><wait10><wait10>",
-        "reboot<enter>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
-        "<wait10><wait10><wait10>",
-	"root<enter><wait5>",
-        "{{user `password`}}<enter><wait5>",
-	"echo http://dl-cdn.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories<enter>",
-	"echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories<enter>",
-        "apk add sudo<enter><wait5>",
-        "echo 'Defaults env_keep += \"http_proxy https_proxy\"' > /etc/sudoers.d/wheel<enter>",
-        "echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers.d/wheel<enter>",
-        "adduser {{user `username`}}<enter><wait5>",
-        "{{user `password`}}<enter><wait>",
-        "{{user `password`}}<enter><wait>",
-        "adduser {{user `username`}} wheel<enter><wait5>"
+        "rc-service sshd stop<enter>",
+        "mount /dev/sda2 /mnt<enter>",
+        "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
+        "umount /mnt<enter>",
+        "reboot<enter>"
       ],
       "accelerator": "kvm",
       "boot_wait": "2m",
@@ -62,8 +49,22 @@
       "vm_name": "packer-alpine-3.12-ppc64le"
     }
   ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/alpine/00base.sh",
+        "scripts/alpine/01alpine.sh",
+        "scripts/alpine/01networking.sh",
+        "scripts/alpine/02sshd.sh",
+        "scripts/alpine/03vagrant.sh",
+        "scripts/alpine/04sudoers.sh",
+        "scripts/alpine/99minimize.sh"
+      ]
+    }
+  ],
   "variables": {
-    "username": "vagrant",
+    "username": "root",
     "password": "vagrant"
   },
   "post-processors": [
