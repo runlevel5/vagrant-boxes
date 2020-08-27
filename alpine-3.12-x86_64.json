@@ -1,6 +1,7 @@
 {
   "builders": [
     {
+      "boot_key_interval": "1ms",
       "boot_command": [
         "root<enter><wait>",
         "ifconfig eth0 up && udhcpc -i eth0<enter><wait10>",
@@ -9,16 +10,7 @@
         "{{user `password`}}<enter><wait>",
         "{{user `password`}}<enter><wait>",
         "<wait10>y<enter>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
-	"<wait10><wait10><wait10>",
+	"<wait10>",
         "rc-service sshd stop<enter>",
         "mount /dev/sda2 /mnt<enter>",
         "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
@@ -26,27 +18,25 @@
         "reboot<enter>"
       ],
       "accelerator": "kvm",
-      "boot_wait": "2m",
+      "boot_wait": "5s",
       "disk_size": "10G",
       "disk_interface": "virtio-scsi",
       "http_directory": "http",
-      "iso_checksum": "b1f552d2ebdf8842d5e0965194fc64c12c5f713e331c043ab1af5f68f32bef5f",
-      "iso_checksum_type": "sha256",
-      "iso_url": "https://dl-cdn.alpinelinux.org/alpine/v3.12/releases/ppc64le/alpine-standard-3.12.0-ppc64le.iso",
-      "output_directory": "packer-alpine-3.12-ppc64le",
+      "iso_checksum": "sha256:fe694a34c0e2d30b9e5dea7e2c1a3892c1f14cb474b69cc5c557a52970071da5",
+      "iso_url": "http://dl-cdn.alpinelinux.org/alpine/v3.12/releases/x86_64/alpine-virt-3.12.0-x86_64.iso",
+      "output_directory": "packer-alpine-3.12-x86_64",
       "shutdown_command": "echo {{user `password`}} | sudo -S /sbin/poweroff",
-      "ssh_username": "{{user `username`}}",
       "ssh_password": "{{user `password`}}",
+      "ssh_username": "{{user `username`}}",
       "ssh_port": 22,
       "ssh_wait_timeout": "10m",
+      "qemu_binary": "qemu-system-x86_64",
       "qemuargs": [
         [ "-m", "2048M" ],
         [ "-boot", "strict=on" ]
       ],
-      "qemu_binary": "qemu-system-ppc64",
-      "machine_type": "pseries",
       "type": "qemu",
-      "vm_name": "packer-alpine-3.12-ppc64le"
+      "vm_name": "packer-alpine-3.12-x86_64"
     }
   ],
   "provisioners": [
@@ -70,7 +60,7 @@
   "post-processors": [
     {
       "keep_input_artifact": true,
-      "output": "box/alpine-3.12-ppc64le.box",
+      "output": "box/alpine-3.12-x86_64.box",
       "type": "vagrant"
     }
   ]
