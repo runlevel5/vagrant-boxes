@@ -5,8 +5,8 @@ Make sure you have the latest version of `packer`.
 1. Build vagrant box:
 
 ```
-# check Makefile for all targets, for example build alpine x86_64
-make alpine_x86_64
+# check Makefile for all targets, for example build alpine x86_64 libvirt
+make alpine_x86_64_libvirt
 ```
 
 2. Add vagrant box:

@@ -1,0 +1,82 @@
+{
+  "builders": [
+    {
+      "boot_command": [
+        "root<enter><wait>",
+        "ifconfig eth0 up && udhcpc -i eth0<enter><wait10>",
+        "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/alpine-{{user `alpine_version`}}/answers<enter><wait>",
+        "setup-alpine -f $PWD/answers<enter><wait5>",
+        "{{user `password`}}<enter><wait>",
+        "{{user `password`}}<enter><wait>",
+        "<wait10>y<enter>",
+	"<wait10>",
+        "rc-service sshd stop<enter>",
+        "mount /dev/sda2 /mnt<enter>",
+        "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
+        "umount /mnt<enter>",
+        "reboot<enter>"
+      ],
+      "type": "virtualbox-iso",
+      "virtualbox_version_file": ".vbox_version",
+      "guest_os_type": "Linux26_64",
+      "disk_size": "{{user `disk_size`}}",
+      "hard_drive_interface": "sata",
+      "guest_additions_mode": "disable",
+      "boot_wait": "30s",
+      "http_directory": "http",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_url": "{{user `iso_url`}}",
+      "output_directory": "packer-alpine",
+      "shutdown_command": "echo {{user `password`}} | sudo -S /sbin/poweroff",
+      "ssh_password": "{{user `password`}}",
+      "ssh_username": "{{user `username`}}",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10m",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "{{user `memory`}}"],
+        ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpus`}}"]
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/alpine/00base.sh",
+        "scripts/alpine/01alpine.sh",
+        "scripts/alpine/01networking.sh",
+        "scripts/alpine/02sshd.sh",
+        "scripts/alpine/03vagrant.sh",
+        "scripts/alpine/04sudoers.sh",
+        "scripts/alpine/99minimize.sh"
+      ]
+    }
+  ],
+  "variables": {
+    "username": "root",
+    "password": "vagrant",
+    "alpine_version": "{{env `ALPINE_VERSION`}}",
+    "arch": "{{env `ARCH`}}",
+    "iso_url": "{{env `ISO_URL`}}",
+    "iso_checksum": "{{env `ISO_CHECKSUM`}}",
+    "vagrantcloud_token": "{{env `VAGRANT_CLOUD_TOKEN`}}",
+    "disk_size": "10240",
+    "memory": "1024",
+    "cpus": "1"
+  },
+  "post-processors": [
+    [
+      {
+        "type": "vagrant",
+        "keep_input_artifact": true,
+        "output": "box/alpine-{{user `alpine_version`}}-{{user `arch`}}.box"
+      },
+      {
+        "type": "vagrant-cloud",
+        "access_token": "{{user `vagrantcloud_token`}}",
+        "box_tag": "alpine-linux/{{user `arch`}}",
+        "version": "{{user `alpine_version`}}"
+      }
+    ]
+  ]
+}
