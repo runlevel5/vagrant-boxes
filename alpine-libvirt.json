@@ -4,7 +4,7 @@
       "boot_key_interval": "1ms",
       "boot_command": [
         "root<enter><wait>",
-        "ifconfig eth0 up && udhcpc -i eth0<enter><wait10>",
+        "ifconfig eth0 up && udhcpc -i eth0<enter><wait5>",
         "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/alpine-{{user `alpine_version`}}/answers<enter><wait>",
         "setup-alpine -f $PWD/answers<enter><wait5>",
         "{{user `password`}}<enter><wait>",
@@ -12,10 +12,11 @@
         "<wait10>y<enter>",
         "<wait{{user `setup_wait`}}>",
         "rc-service sshd stop<enter>",
-        "mount /dev/sda2 /mnt<enter>",
-        "echo 'PermitRootLogin yes' >> /mnt/etc/ssh/sshd_config<enter>",
-        "umount /mnt<enter>",
-        "reboot<enter>"
+        "reboot<enter><wait{{user `reboot_wait`}}>",
+        "root<enter><wait>{{user `password`}}<enter><wait5>",
+        "echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config<enter>",
+        "rc-service sshd restart<enter><wait5>",
+        "exit<enter>"
       ],
       "accelerator": "kvm",
       "boot_wait": "{{user `boot_wait`}}",
@@ -61,6 +62,7 @@
     "iso_url": "{{env `ISO_URL`}}",
     "machine_type": "{{env `MACHINE_TYPE`}}",
     "boot_wait": "{{env `BOOT_WAIT`}}",
+    "reboot_wait": "{{env `REBOOT_WAIT`}}",
     "setup_wait": "{{env `SETUP_WAIT`}}",
     "iso_checksum": "{{env `ISO_CHECKSUM`}}",
     "vagrantcloud_token": "{{env `VAGRANT_CLOUD_TOKEN`}}"
@@ -75,7 +77,7 @@
       {
         "type": "vagrant-cloud",
         "access_token": "{{user `vagrantcloud_token`}}",
-        "box_tag": "alpine-linux/{{user `arch`}}",
+        "box_tag": "alpine-linux/alpine-{{user `arch`}}",
         "version": "{{user `alpine_version`}}"
       }
     ]
