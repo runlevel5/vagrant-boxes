@@ -30,7 +30,7 @@
       "ssh_username": "{{user `username`}}",
       "ssh_port": 22,
       "ssh_wait_timeout": "10m",
-      "qemu_binary": "qemu-system-{{user `arch`}}",
+      "qemu_binary": "qemu-system-{{user `arch` | replace_all \"64le\" \"64\"}}",
       "qemuargs": [
         [ "-m", "2048M" ],
         [ "-boot", "strict=on" ]
